@@ -1,32 +1,34 @@
-import socket  # Import socket library for network connections
-import ssl  # Import ssl library for secure socket layer operations
-import struct  # Import struct for packing and unpacking data
+import socket   # Import socket library for network connections
+import ssl      # Import ssl library for secure socket layer operations
+import struct   # Import struct for packing and unpacking data
 import logging  # Import logging for logging messages
 
+# Create a named logger
+logger = logging.getLogger("DNSProxy")
 logging.basicConfig(
     level=logging.INFO
 )  # Configure the logging to display INFO level messages
 
 
-def start_proxy(listen_addr, tls_addr):
+def start_proxy(listen_addr, tls_dns_server_addr):
     # Create a TCP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Bind the socket to the specified listening address and port
     sock.bind(listen_addr)
-    # Listen for incoming connections (with a maximum backlog of 1 connection)
-    sock.listen(1)
+    # Listen for incoming connections (with a maximum backlog of 2 connection)
+    sock.listen(2)
     # Log that the proxy is listening
-    logging.info(f"Listening for DNS on {listen_addr}")
+    logger.info(f"Listening for DNS on {listen_addr}")
 
     # Infinite loop to continuously accept new connections
     while True:
         # Accept an incoming connection
         client, _ = sock.accept()
         # Handle the client connection in a separate function
-        handle_client(client, tls_addr)
+        handle_client(client, tls_dns_server_addr)
 
 
-def handle_client(client_conn, tls_addr):
+def handle_client(client_conn, tls_dns_server_addr):
     # Use 'with' to automatically close the connection when done
     with client_conn:
         # Receive the first 2 bytes indicating the query length
@@ -44,15 +46,15 @@ def handle_client(client_conn, tls_addr):
 
         # Parse and log the domain name from the query
         domain_name = parse_domain_name(query)
-        logging.info(f"DNS query for {domain_name}")
+        logger.info(f"Received DNS query for {domain_name}")
 
         # Create a default SSL context for secure connections
         context = ssl.create_default_context()
 
         # Establish a secure connection to the specified TLS address
-        with socket.create_connection(tls_addr) as raw_sock:
+        with socket.create_connection(tls_dns_server_addr) as raw_sock:
             # Wrap the raw socket with SSL for encryption
-            with context.wrap_socket(raw_sock, server_hostname=tls_addr[0]) as tls_conn:
+            with context.wrap_socket(raw_sock, server_hostname=tls_dns_server_addr[0]) as tls_conn:
                 # Send the query length and query data over the secure connection
                 tls_conn.send(struct.pack("!H", length) + query)
                 # Loop to continuously forward data from the TLS connection back to the client
@@ -87,7 +89,6 @@ def parse_domain_name(query):
     return domain_name[:-1]
 
 
-# Check if the script is being run directly (not imported as a module)
 if __name__ == "__main__":
     # Start the proxy listening on port 53 and forwarding to 1.1.1.1:853 (Cloudflare's DNS-over-TLS endpoint)
     start_proxy(("", 53), ("1.1.1.1", 853))
