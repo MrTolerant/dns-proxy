@@ -1,0 +1,6 @@
+version: '3'
+services:
+  dns-proxy:
+    build: .
+    ports:
+      - "5553:53/tcp"

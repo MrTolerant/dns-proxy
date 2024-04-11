@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dns-to-dot-proxy
+  labels:
+    app: dns-to-dot-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dns-to-dot-proxy
+  template:
+    metadata:
+      labels:
+        app: dns-to-dot-proxy
+    spec:
+      containers:
+      - name: dns-to-dot-proxy
+        image: yourusername/dns-to-dot-proxy:latest
+        ports:
+        - containerPort: 53
+          name: dns
+          protocol: TCP
+        - containerPort: 53
+          name: dns-udp
+          protocol: UDP
+        securityContext:
+          capabilities:
+            add: ["NET_BIND_SERVICE"]
+          allowPrivilegeEscalation: false
