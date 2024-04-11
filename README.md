@@ -44,6 +44,8 @@ Configure DNS client to use ```localhost``` as DNS server and use **TCP** querie
 **Example**:
 ```
 dig @localhost -p 5553 +tcp wwww.com
+dig @localhost -p 5553 +tcp google.com
+dig @localhost -p 5553 +tcp n26.com
 ```
 
 you should see something like:
@@ -75,7 +77,16 @@ wwww.com.		26908	IN	A	31.31.196.223
 And inside docker logs you will see:
 ```
 dns-proxy-dns-proxy-1  | INFO:DNSProxy:Listening for DNS on ('', 53)
-dns-proxy-dns-proxy-1  | INFO:DNSProxy:Received DNS query for n26.com
-dns-proxy-dns-proxy-1  | INFO:DNSProxy:Received DNS query for wwww.com
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Handling client connection
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Parsed domain name: www.com
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Received DNS query for www.com
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Response sent back to client for www.com
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Handling client connection
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Parsed domain name: google.com
 dns-proxy-dns-proxy-1  | INFO:DNSProxy:Received DNS query for google.com
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Response sent back to client for google.com
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Handling client connection
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Parsed domain name: n26.com
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Received DNS query for n26.com
+dns-proxy-dns-proxy-1  | INFO:DNSProxy:Response sent back to client for n26.com
 ```
