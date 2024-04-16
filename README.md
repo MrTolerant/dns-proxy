@@ -2,8 +2,7 @@
 
 ## Overview
 
-Written using Python language proxy forwarding DNS queries over TLS for secure
-- private communications.
+Written using Python language proxy forwarding DNS queries over TLS for secure, private communications.
 
 It listens on port 53, directing queries to Cloudflare's DoT endpoint (`1.1.1.1:853`)
 
