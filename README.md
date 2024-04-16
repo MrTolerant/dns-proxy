@@ -35,7 +35,7 @@ Key concerns include:
 ### Instructions
 
 1. Build and Deploy: `docker-compose up --build`
-2. This stack mapping host port ```5553``` to container port ```53``` for testig purposes, because for binding ```53``` port you need root privileges
+2. This docker-compose stack mapping host port ```5553``` to container port ```53``` for testing purposes, because for binding ```53``` port you need root privileges
 
 ### Testing
 
